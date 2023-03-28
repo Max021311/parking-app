@@ -1,6 +1,7 @@
 import { app, BrowserWindow, shell, ipcMain } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
+import { printTicket } from './common/print-ticket'
 
 // The built directory structure
 //
@@ -44,6 +45,7 @@ async function createWindow() {
   win = new BrowserWindow({
     title: 'Main window',
     icon: join(process.env.PUBLIC, 'favicon.ico'),
+    fullscreen: true,
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -114,4 +116,14 @@ ipcMain.handle('open-win', (_, arg) => {
   } else {
     childWindow.loadFile(indexHtml, { hash: arg })
   }
+})
+
+ipcMain.handle('print-ticket', (_event, ticketData) => {
+  return new Promise((resolve, reject) => {
+    try {
+      resolve(printTicket(ticketData))
+    } catch (error) {
+      reject(error)
+    }
+  })
 })
