@@ -1,7 +1,9 @@
 interface TicketData {
+  /** @description ISO date */
   date: string
   position: string
   id: number
+  placeType: 'normal'|'big'|'worker'|'special'
 }
 
 declare namespace Electron {
