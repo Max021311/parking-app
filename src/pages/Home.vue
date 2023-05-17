@@ -5,6 +5,7 @@
   import { ref, reactive } from 'vue'
   import Card from './../components/Card.vue'
   import Message from './../components/Message.vue'
+  import axios from './../common/axios'
 
   const placesDict = {
     normal: 'Normal',
@@ -17,39 +18,26 @@
   let messageType = ref<InstanceType<typeof Message>['$props']['type']>('success')
   let showMessage = ref(false)
   let message = ref('')
-  let placeType = ref<TicketData['placeType']>('normal')
-
-  interface Form {
-    placeType: string | null
-  }
-
-  const form = reactive<Form>({
-    placeType: null
-  })
+  let placeType = ref<ParkingPlace['type']>('normal')
 
   const printTickt = async () => {
     try {
       isPrinting.value = true
       console.log(`Request place of type: ${placeType.value}`)
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      const ticketData = {
-        date: new Date().toISOString(),
-        id: 1,
-        position: 'A1',
-        placeType: placeType.value
-      }
-      const filename = await ipcRenderer.invoke('print-ticket', ticketData)
+      const res = await axios.post<TicketData>('/assign-parking-place', {
+        type: placeType.value
+      })
+      const filename = await ipcRenderer.invoke('print-ticket', res.data)
       console.log(`Copying "${filename}" to clipboard`)
       clipboard.writeText(filename, 'clipboard')
 
-      isPrinting.value = false
-
       messageType.value = "success"
-      message.value = "Se te asigno el lugar A1"
+      message.value = "Se te asigno el lugar " + res.data.parking_place.slug
     } catch (err) {
       messageType.value = 'error',
       message.value = 'Hubo un error asignandote un lugar. Intentalo de nuevo, si el problema persiste contacta a soporte.'
     }
+    isPrinting.value = false
     showMessage.value = true
     setTimeout(() => {
       showMessage.value = false
