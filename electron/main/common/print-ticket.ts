@@ -20,7 +20,7 @@ function milimetersToPoints (milimeters: number) {
 
 export function printTicket (ticketData: TicketData) {
   const tempDir = app.getPath('temp')
-  const filename = `${ticketData.date.replace(/:/g, '-')}-${ticketData.id}.pdf`
+  const filename = `${ticketData.entry_date.replace(/:/g, '-')}-${ticketData.id}.pdf`
   const filepath = join(tempDir, filename)
   const pdf = pdfPrinter.createPdfKitDocument({
     pageSize: { width: milimetersToPoints(58), height: 'auto' },
@@ -28,10 +28,10 @@ export function printTicket (ticketData: TicketData) {
     pageMargins: 10,
     content: [
       { text: `ID: ${ticketData.id}`, style: 'body' },
-      { text: `Fecha: ${ticketData.date}`, style: 'body' },
-      { text: `Lugar: ${ticketData.position}`, style: 'body' },
-      { text: `Tipo de lugar: ${ticketData.placeType}`, style: 'body' },
-      { qr: JSON.stringify({ id: ticketData.id }) }
+      { text: `Fecha: ${ticketData.entry_date}`, style: 'body' },
+      { text: `Lugar: ${ticketData.parking_place.slug}`, style: 'body' },
+      { text: `Tipo de lugar: ${ticketData.parking_place.type}`, style: 'body' },
+      { qr: ticketData.id.toString() }
     ],
     styles: {
       body: { fontSize: 5 }

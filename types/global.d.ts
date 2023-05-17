@@ -1,9 +1,22 @@
+interface ParkingPlace {
+  id: number
+  slug: number
+  type: string
+  position: {
+    type: 'Point'
+    coordinates: [number, number]
+    isActive: boolean
+    tickets: undefined | TicketData[]
+  }
+}
+
 interface TicketData {
   /** @description ISO date */
-  date: string
-  position: string
   id: number
-  placeType: 'normal'|'big'|'worker'|'special'
+  entry_date: string
+  parking_place_id: number
+  departure_date: string | null
+  parking_place: ParkingPlace
 }
 
 declare namespace Electron {
