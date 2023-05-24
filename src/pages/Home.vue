@@ -68,6 +68,7 @@
       messageType.value = "success"
       message.value = "Se te asigno el lugar " + res.data.parking_place.slug
     } catch (err) {
+      console.error(err)
       if (isAxiosError(err) && err.response?.status === 503) {
         messageType.value = 'error',
         message.value = 'Lo sentimos, pero no hay lugares disponibles de ese tipo en este momento.'
