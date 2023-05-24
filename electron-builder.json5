@@ -15,6 +15,10 @@
   "extraFiles": [
     "resources/**/*"
   ],
+  "linux": {
+    "artifactName": "${productName}_${version}.${ext}",
+    "target": ["AppImage"]
+  },
   "mac": {
     "artifactName": "${productName}_${version}.${ext}",
     "target": [
