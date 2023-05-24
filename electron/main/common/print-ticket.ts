@@ -2,13 +2,15 @@ import { app, ipcMain } from 'electron'
 import fs from 'node:fs'
 import { join } from 'node:path'
 import PdfPrinter from 'pdfmake'
+import { isPackaged } from 'electron-is-packaged'
 
+const resourcePath = isPackaged ? process.resourcesPath : join(process.cwd(), 'resources')
 const fonts = {
   Roboto: {
-    normal: join(process.cwd(), 'fonts/Roboto-Regular.ttf'),
-    bold: join(process.cwd(), 'fonts/Roboto-Medium.ttf'),
-    italics: join(process.cwd(), 'fonts/Roboto-Italic.ttf'),
-    bolditalics: join(process.cwd(), 'fonts/Roboto-MediumItalic.ttf')
+    normal: join(resourcePath, 'fonts/Roboto-Regular.ttf'),
+    bold: join(resourcePath, 'fonts/Roboto-Medium.ttf'),
+    italics: join(resourcePath, 'fonts/Roboto-Italic.ttf'),
+    bolditalics: join(resourcePath, 'fonts/Roboto-MediumItalic.ttf')
   }
 };
 
