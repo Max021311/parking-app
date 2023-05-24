@@ -2,10 +2,12 @@
   import Spinner from './../components/Spinner.vue'
   import Button from './../components/Button.vue'
   import { ipcRenderer, clipboard } from 'electron'
-  import { ref, reactive } from 'vue'
+  import { ref, onMounted } from 'vue'
   import Card from './../components/Card.vue'
   import Message from './../components/Message.vue'
   import axios from './../common/axios'
+  import { isAxiosError } from 'axios'
+  import { Html5Qrcode, QrcodeSuccessCallback } from 'html5-qrcode'
 
   const placesDict = {
     normal: 'Normal',
@@ -19,6 +21,38 @@
   let showMessage = ref(false)
   let message = ref('')
   let placeType = ref<ParkingPlace['type']>('normal')
+  let isProcessingQr = ref<boolean>(false)
+  let isCanvasEnabled = ref<boolean>(false)
+
+  const onQrSuccess: QrcodeSuccessCallback = async function (decodedText, decodedResult) {
+    if (isProcessingQr.value) { return }
+    isProcessingQr.value = true
+    console.log({ decodedText, decodedResult })
+    try {
+      const id = parseInt(decodedText, 10)
+      await axios.post(`/ticket/${id}/register-exit`)
+    } catch (err) {
+      console.error(err)
+    }
+    isProcessingQr.value = false
+  }
+
+  onMounted(async () => {
+    const [camera] = await Html5Qrcode.getCameras()
+    const scanner = new Html5Qrcode('reader')
+    scanner.start(
+      camera.id,
+      { fps: 1 },
+      onQrSuccess,
+      () => {}
+    )
+  })
+
+  window.addEventListener('keydown', (event: KeyboardEvent) => {
+    if(event.key === 'C') {
+      isCanvasEnabled.value = !isCanvasEnabled.value
+    }
+  })
 
   const printTickt = async () => {
     try {
@@ -34,8 +68,13 @@
       messageType.value = "success"
       message.value = "Se te asigno el lugar " + res.data.parking_place.slug
     } catch (err) {
-      messageType.value = 'error',
-      message.value = 'Hubo un error asignandote un lugar. Intentalo de nuevo, si el problema persiste contacta a soporte.'
+      if (isAxiosError(err) && err.response?.status === 503) {
+        messageType.value = 'error',
+        message.value = 'Lo sentimos, pero no hay lugares disponibles de ese tipo en este momento.'
+      } else {
+        messageType.value = 'error',
+        message.value = 'Hubo un error asignandote un lugar. Intentalo de nuevo, si el problema persiste contacta a soporte.'
+      }
     }
     isPrinting.value = false
     showMessage.value = true
@@ -89,4 +128,10 @@
       :description="message"
     />
   </Card>
+  <div class="flex justify-center">
+    <div id="reader" :class="[
+      'w-1/2',
+      isCanvasEnabled ? 'visible' : 'invisible'
+    ]" />
+  </div>
 </template>
