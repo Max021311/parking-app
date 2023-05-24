@@ -31,10 +31,11 @@ export function printTicket (ticketData: TicketData) {
       { text: `Fecha: ${ticketData.entry_date}`, style: 'body' },
       { text: `Lugar: ${ticketData.parking_place.slug}`, style: 'body' },
       { text: `Tipo de lugar: ${ticketData.parking_place.type}`, style: 'body' },
-      { qr: ticketData.id.toString() }
+      { qr: ticketData.id.toString(), style: 'center' }
     ],
     styles: {
-      body: { fontSize: 5 }
+      body: { fontSize: 5 },
+      center: { alignment: 'center' }
     }
   })
   pdf.pipe(fs.createWriteStream(filepath))
