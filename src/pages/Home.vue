@@ -118,7 +118,6 @@
         <p>Estaciónate en el lugar que el boleto indique</p>
         <p>Respete los lugares de estacionamiento</p>
         <p>Procure no generar conflictos</p>
-        <p>Saludos crack</p>
       </div>
     </div>
     <Message
